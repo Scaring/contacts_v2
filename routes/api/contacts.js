@@ -1,41 +1,21 @@
 const express = require("express");
 
-const contacts = require("../../controllers/contacts/index");
+const ctrl = require("../../controllers/contacts");
+
+const {validateBody} = require("../../middlewares");
+
+const schemas = require("../../schemas/contacts");
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-    console.log("Get all!")
-    res.json(await contacts.listContacts());
-})
+router.get("/", ctrl.getAll);
 
-router.get("/:id", async (req, res) => {
-    console.log("Get by id!");
-    const { id } = req.params;
-    const searchedUser = await contacts.getContactById(id);
-    res.json(searchedUser);
-})
+router.get("/:id", ctrl.getById);
 
-router.post("/", async (req, res) => {
-    console.log("Add user!");
-    const { name, phone, email } = req.body;
-    const newUser = await contacts.addContact({name, phone, email});
-    res.json(newUser);
-})
+router.post("/", validateBody(schemas.addSchema), ctrl.post);
 
-router.patch("/:id", async (req, res) => {
-    console.log("Update user!");
-    const { id } = req.params;
-    const { name, phone, email } = req.body;
-    const updatedUser = await contacts.updateContact({id, name, phone, email});
-    res.json(updatedUser);
-})
+router.put("/:id", validateBody(schemas.addSchema), ctrl.update);
 
-router.delete("/:id", async (req, res) => {
-    console.log("Removed!");
-    const {id} = req.params;
-    const removedUser = await contacts.removeContact(id);
-    res.json(removedUser);
-})
+router.delete("/:id", ctrl.remove);
 
 module.exports = router;
